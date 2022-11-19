@@ -1,0 +1,56 @@
+version: '3'
+
+services:
+  consul:
+    image: consul:latest
+    container_name: consul
+    ports:
+      - "8500:8500"
+    networks:
+      - my-net
+
+  helloService:
+    image: lyumikael/go-modd-env:v1.0.0
+    container_name: helloService
+    environment:
+      - TZ=Asia/Shanghai
+      - GOPROXY=https://goproxy.cn,direct
+      - CONSUL_HTTP_ADDR=localhost:8500
+    working_dir: /go/helloService
+    volumes:
+      - .:/go/helloService
+    privileged: true
+    restart: always
+    networks:
+      - my-net
+
+#  helloworld-server:
+#    build:
+#      context: .
+#      dockerfile: server/Dockerfile
+#    image: helloworld-server:1.0.1
+#    environment:
+#      - CONSUL_HTTP_ADDR=consul:8500
+#      - GOPROXY:https://goproxy.cn,direct
+#    depends_on:
+#      - consul
+#    networks:
+#      - my-net
+#
+#  helloworld-client:
+#    build:
+#      context: .
+#      dockerfile: client/Dockerfile
+#    image: helloworld-client:1.0.1
+#    environment:
+#      - CONSUL_HTTP_ADDR=consul:8500
+#      - GOPROXY:https://goproxy.cn,direct
+#    depends_on:
+#      - consul
+#      - helloworld-server
+#    networks:
+#      - my-net
+
+networks:
+  my-net:
+    driver: bridge
